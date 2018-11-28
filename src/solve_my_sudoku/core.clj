@@ -31,27 +31,6 @@
   (letfn [(sub-board [n] (vals (select-keys b (nth index-set n))))]
     (doall (map sub-board (range 9)))))
 
-(defn bound-vars-indexes
-  [board]
-  (let [indexed-bound-vars (filter identity
-                                   (map-indexed (fn [idx el] (when-not (zero? el) [idx el])) board))
-        indexes (map first indexed-bound-vars)
-        values (map second indexed-bound-vars)]
-    [indexes values]))
-
-(defn bind-vars
-  "Bind all non-zero in-vars to the equivalent lvar in solve-vars."
-  [in-vars solve-vars]
-  (if-not (empty? in-vars)
-    (let [[in & in-rest] in-vars
-          [solve & solve-rest] solve-vars]
-      (all
-       (if-not (zero? in)
-         (== in solve)
-         succeed)
-       (bind-vars in-rest solve-rest)))
-    succeed))
-
 (defn solve
   "Takes a sudoku as a vector, with all empty cells set to 0 and returns
   a solved sudoku as a vector.
@@ -69,9 +48,7 @@
      7 0 3 0 1 8 0 0 0])
   "
   [sudoku]
-  (let [board (vec (repeatedly 81 lvar))
-        [indexes values] (bound-vars-indexes sudoku)
-        prebound-lvars (vals (select-keys board indexes))
+  (let [board (vec (map #(if (zero? %) (lvar) %) sudoku))
         rows (indexed-sub-board board row-indexes)
         cols (indexed-sub-board board column-indexes)
         squares (indexed-sub-board board square-indexes)]
@@ -83,8 +60,6 @@
        (everyg #(fd/in % (fd/interval 1 9)) board)
        ;; bind non zero elements to the board
 
-       ;; TODO WHY DON'T YOU WORK?
-       (== prebound-lvars values)
        ;; every number can appear only once per row
        (everyg fd/distinct rows)
        ;; every number can appear only once per column

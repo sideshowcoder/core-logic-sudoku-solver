@@ -90,7 +90,6 @@
        (== q board)
        ;; only 1 - 9 are allowed
        (everyg #(fd/in % (fd/interval 1 9)) board)
-       ;; bind non zero elements to the board
 
        ;; every number can appear only once per row
        (everyg fd/distinct rows)

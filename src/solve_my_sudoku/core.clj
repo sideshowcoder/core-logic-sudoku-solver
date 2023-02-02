@@ -1,4 +1,5 @@
 (ns solve-my-sudoku.core
+  (:gen-class)
   (:refer-clojure :exclude [==]) ;; core.logic defines :== as well
   (:require [clojure.string :as s]
             [clojure.core.logic :refer :all]
@@ -114,4 +115,10 @@
   [sudoku]
   (doall (map #(println (s/join " " %)) (partition 9 sudoku))))
 
-(print-sudoku (solve wildcatjan17))
+(defn -main
+  "Hello world."
+  [& args]
+  (println "Input sudoku board (0 represent unfilled)")
+  (print-sudoku wildcatjan17)
+  (println "solved")
+  (print-sudoku (solve wildcatjan17)))
